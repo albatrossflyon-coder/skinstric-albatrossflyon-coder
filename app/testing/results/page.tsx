@@ -89,20 +89,7 @@ export default function ResultsPage() {
     setSelections((prev) => ({ ...prev, [category]: label }));
   }
 
-  if (!data) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p className="text-[11px] tracking-widest uppercase opacity-30">
-          No analysis data found.{" "}
-          <Link href="/testing/select-analysis" className="underline">
-            Start over
-          </Link>
-        </p>
-      </div>
-    );
-  }
-
-  const entries = sortedEntries(data[activeCategory]);
+  const entries = data ? sortedEntries(data[activeCategory]) : [];
 
   return (
     <div ref={containerRef} className="flex flex-col h-screen select-none">
@@ -118,58 +105,69 @@ export default function ResultsPage() {
       </header>
 
       <main ref={contentRef} className="flex flex-1 overflow-hidden">
-        {/* Left sidebar — confirmed selections */}
-        <aside className="w-56 border-r border-black/[0.08] flex flex-col justify-center px-6 py-8 shrink-0">
-          <p className="text-[10px] tracking-[0.2em] uppercase text-black/30 mb-6">
-            Predicted
-          </p>
-          {(Object.keys(CATEGORY_LABELS) as CategoryKey[]).map((cat) => (
-            <div key={cat} className="mb-5">
-              <p className="text-[10px] tracking-[0.15em] uppercase text-black/30 mb-1">
-                {CATEGORY_LABELS[cat]}
-              </p>
-              <p className="text-sm font-medium">
-                {selections[cat] || "—"}
-              </p>
-            </div>
-          ))}
-        </aside>
-
-        {/* Right — category tabs + scores */}
-        <div className="flex flex-col flex-1 overflow-hidden">
-          {/* Category tabs */}
-          <div className="flex border-b border-black/[0.08]">
-            {(Object.keys(CATEGORY_LABELS) as CategoryKey[]).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-4 text-[11px] tracking-[0.15em] uppercase transition-colors ${
-                  activeCategory === cat
-                    ? "border-b-2 border-black font-semibold"
-                    : "opacity-30 hover:opacity-60"
-                }`}
-              >
-                {CATEGORY_LABELS[cat]}
-              </button>
-            ))}
-          </div>
-
-          {/* Score list */}
-          <div className="flex-1 overflow-y-auto py-4 px-4">
-            <p className="text-[10px] tracking-[0.2em] uppercase text-black/30 px-3 mb-3">
-              Probability — click to select
+        {!data ? (
+          <div className="flex flex-1 items-center justify-center">
+            <p className="text-[11px] tracking-widest uppercase opacity-30">
+              No analysis data found.{" "}
+              <Link href="/testing/select-analysis" className="underline">
+                Start over
+              </Link>
             </p>
-            {entries.map(([label, value]) => (
-              <ScoreBar
-                key={label}
-                label={label}
-                value={value}
-                isSelected={selections[activeCategory] === label}
-                onClick={() => selectEntry(activeCategory, label)}
-              />
-            ))}
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Left sidebar — confirmed selections */}
+            <aside className="w-56 border-r border-black/[0.08] flex flex-col justify-center px-6 py-8 shrink-0">
+              <p className="text-[10px] tracking-[0.2em] uppercase text-black/30 mb-6">
+                Predicted
+              </p>
+              {(Object.keys(CATEGORY_LABELS) as CategoryKey[]).map((cat) => (
+                <div key={cat} className="mb-5">
+                  <p className="text-[10px] tracking-[0.15em] uppercase text-black/30 mb-1">
+                    {CATEGORY_LABELS[cat]}
+                  </p>
+                  <p className="text-sm font-medium">
+                    {selections[cat] || "—"}
+                  </p>
+                </div>
+              ))}
+            </aside>
+
+            {/* Right — category tabs + scores */}
+            <div className="flex flex-col flex-1 overflow-hidden">
+              <div className="flex border-b border-black/[0.08]">
+                {(Object.keys(CATEGORY_LABELS) as CategoryKey[]).map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`px-6 py-4 text-[11px] tracking-[0.15em] uppercase transition-colors ${
+                      activeCategory === cat
+                        ? "border-b-2 border-black font-semibold"
+                        : "opacity-30 hover:opacity-60"
+                    }`}
+                  >
+                    {CATEGORY_LABELS[cat]}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex-1 overflow-y-auto py-4 px-4">
+                <p className="text-[10px] tracking-[0.2em] uppercase text-black/30 px-3 mb-3">
+                  Probability — click to select
+                </p>
+                {entries.map(([label, value]) => (
+                  <ScoreBar
+                    key={label}
+                    label={label}
+                    value={value}
+                    isSelected={selections[activeCategory] === label}
+                    onClick={() => selectEntry(activeCategory, label)}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </main>
 
       {/* Navigation */}
