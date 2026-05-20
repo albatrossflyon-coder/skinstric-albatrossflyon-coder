@@ -91,13 +91,13 @@ export default function SelectAnalysisPage() {
             Grant camera access to get an A.I. analysis of your skin
           </h1>
 
-          <div className="flex gap-6 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
             {/* Gallery */}
             <button
               onMouseEnter={() => setHovered("gallery")}
               onMouseLeave={() => setHovered(null)}
               onClick={() => handleSelect("gallery")}
-              className={`flex flex-col items-center justify-center gap-4 w-52 h-52 border transition-all duration-200 ${
+              className={`flex flex-col items-center justify-center gap-4 w-full sm:w-52 h-44 sm:h-52 border transition-all duration-200 ${
                 hovered === "gallery"
                   ? "border-black bg-black text-white"
                   : "border-black/20 bg-white text-black hover:border-black/40"
@@ -119,7 +119,7 @@ export default function SelectAnalysisPage() {
               onMouseEnter={() => setHovered("camera")}
               onMouseLeave={() => setHovered(null)}
               onClick={() => handleSelect("camera")}
-              className={`flex flex-col items-center justify-center gap-4 w-52 h-52 border transition-all duration-200 ${
+              className={`flex flex-col items-center justify-center gap-4 w-full sm:w-52 h-44 sm:h-52 border transition-all duration-200 ${
                 hovered === "camera"
                   ? "border-black bg-black text-white"
                   : "border-black/20 bg-white text-black hover:border-black/40"

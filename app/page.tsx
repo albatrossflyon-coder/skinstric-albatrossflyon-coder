@@ -35,20 +35,15 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen select-none">
+    <div className="flex flex-col min-h-screen select-none">
       {/* Header */}
       <header
         ref={headerRef}
-        className="flex items-center justify-between px-8 py-5 border-b border-black/[0.08]"
+        className="flex items-center justify-between px-5 py-4 md:px-8 md:py-5 border-b border-black/[0.08]"
       >
-        <Link
-          href="/"
-          className="text-[11px] font-semibold tracking-[0.2em] uppercase"
-        >
+        <Link href="/" className="text-[11px] font-semibold tracking-[0.2em] uppercase">
           Skinstric
         </Link>
-
-        {/* Bracketed section label */}
         <div className="flex items-center gap-1.5 text-[11px] tracking-[0.15em] uppercase">
           <CornerBracket position="tl" />
           <CornerBracket position="bl" />
@@ -56,7 +51,6 @@ export default function Home() {
           <CornerBracket position="tr" />
           <CornerBracket position="br" />
         </div>
-
         <Link
           href="/testing"
           className="text-[11px] tracking-[0.15em] uppercase opacity-40 hover:opacity-100 transition-opacity"
@@ -68,32 +62,32 @@ export default function Home() {
       {/* Hero */}
       <main
         ref={heroRef}
-        className="flex flex-col flex-1 justify-end px-10 pb-20 md:px-16"
+        className="flex flex-col flex-1 justify-end px-5 pb-16 md:px-16 md:pb-20"
       >
-        <p className="text-[10px] tracking-[0.25em] uppercase text-black/30 mb-5">
+        <p className="text-[10px] tracking-[0.25em] uppercase text-black/30 mb-4 md:mb-5">
           A.I. Skincare
         </p>
 
-        <h1 className="text-5xl md:text-7xl font-semibold leading-[1.05] tracking-[-0.02em] mb-6">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-semibold leading-[1.05] tracking-[-0.02em] mb-5 md:mb-6">
           Sophisticated<br />skincare
         </h1>
 
-        <p className="text-xs leading-relaxed text-black/50 max-w-[260px] mb-10">
+        <p className="text-xs leading-relaxed text-black/50 max-w-[260px] mb-8 md:mb-10">
           Skinstric developed an A.I. that creates a highly-personalized routine
           tailored to what your skin needs.
         </p>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
           <Link
             href="/testing"
-            className="flex items-center gap-2 px-7 py-3 bg-black text-white text-[11px] tracking-[0.15em] uppercase hover:bg-black/80 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 md:px-7 bg-black text-white text-[11px] tracking-[0.15em] uppercase hover:bg-black/80 transition-colors"
           >
             <span>◀</span>
             <span>Enter Experience</span>
           </Link>
           <Link
             href="/testing"
-            className="flex items-center gap-2 px-7 py-3 border border-black text-[11px] tracking-[0.15em] uppercase hover:bg-black/[0.03] transition-colors"
+            className="flex items-center gap-2 px-6 py-3 md:px-7 border border-black text-[11px] tracking-[0.15em] uppercase hover:bg-black/[0.03] transition-colors"
           >
             <span>Take Test</span>
             <span>▶</span>
@@ -102,8 +96,8 @@ export default function Home() {
       </main>
 
       {/* Discover A.I. */}
-      <div className="px-10 pb-8 md:px-16">
-        <button className="flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase opacity-40 hover:opacity-100 transition-opacity">
+      <div className="px-5 pb-6 md:px-16 md:pb-8">
+        <button className="flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase opacity-40 hover:opacity-100 transition-opacity py-2">
           <div className="w-4 h-4 rounded-full border border-black/50 flex items-center justify-center">
             <span className="text-[8px]">▶</span>
           </div>

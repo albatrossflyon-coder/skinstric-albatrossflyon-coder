@@ -145,7 +145,7 @@ export default function IntroPage() {
       </header>
 
       {/* Form */}
-      <main className="flex flex-col flex-1 items-center justify-center px-8">
+      <main className="flex flex-col flex-1 items-center justify-center px-5 md:px-8">
         <div ref={formRef} className="w-full max-w-sm">
           <p className="text-[10px] tracking-[0.25em] uppercase text-black/30 mb-3">
             To Start Analysis

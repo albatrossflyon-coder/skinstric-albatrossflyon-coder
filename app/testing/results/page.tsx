@@ -104,7 +104,7 @@ export default function ResultsPage() {
         <div className="w-20" />
       </header>
 
-      <main ref={contentRef} className="flex flex-1 overflow-hidden">
+      <main ref={contentRef} className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {!data ? (
           <div className="flex flex-1 items-center justify-center">
             <p className="text-[11px] tracking-widest uppercase opacity-30">
@@ -117,7 +117,7 @@ export default function ResultsPage() {
         ) : (
           <>
             {/* Left sidebar — confirmed selections */}
-            <aside className="w-56 border-r border-black/[0.08] flex flex-col justify-center px-6 py-8 shrink-0">
+            <aside className="w-full md:w-56 border-b md:border-b-0 md:border-r border-black/[0.08] flex flex-row md:flex-col justify-start md:justify-center gap-6 md:gap-0 px-5 py-4 md:px-6 md:py-8 shrink-0 overflow-x-auto">
               <p className="text-[10px] tracking-[0.2em] uppercase text-black/30 mb-6">
                 Predicted
               </p>
@@ -135,7 +135,7 @@ export default function ResultsPage() {
 
             {/* Right — category tabs + scores */}
             <div className="flex flex-col flex-1 overflow-hidden">
-              <div className="flex border-b border-black/[0.08]">
+              <div className="flex border-b border-black/[0.08] overflow-x-auto shrink-0">
                 {(Object.keys(CATEGORY_LABELS) as CategoryKey[]).map((cat) => (
                   <button
                     key={cat}
