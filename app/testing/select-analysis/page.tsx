@@ -6,32 +6,15 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { RiImageLine, RiCameraLine } from "react-icons/ri";
 
-function Diamond({
-  size,
-  variant,
-  className,
-}: {
-  size: number;
-  variant: "light" | "medium" | "dark";
-  className?: string;
-}) {
-  const styles: Record<string, { bg: string; border: string }> = {
-    light:  { bg: "transparent",        border: "rgba(0,0,0,0.12)" },
-    medium: { bg: "rgba(0,0,0,0.06)",   border: "rgba(0,0,0,0.20)" },
-    dark:   { bg: "rgba(0,0,0,0.85)",   border: "rgba(0,0,0,0.85)" },
-  };
-  const s = styles[variant];
+function DiamondIcon({ direction, active }: { direction: "left" | "right"; active: boolean }) {
   return (
     <div
-      className={`absolute pointer-events-none ${className}`}
-      style={{
-        width: size,
-        height: size,
-        transform: "rotate(45deg)",
-        background: s.bg,
-        border: `1px solid ${s.border}`,
-      }}
-    />
+      className={`w-6 h-6 border border-black rotate-45 flex items-center justify-center shrink-0 transition-transform duration-300 ${active ? "scale-125" : "scale-100"}`}
+    >
+      <span className="-rotate-45 text-[8px] leading-none">
+        {direction === "left" ? "◀" : "▶"}
+      </span>
+    </div>
   );
 }
 
@@ -41,11 +24,11 @@ export default function SelectAnalysisPage() {
   const router = useRouter();
   const [hovered, setHovered] = useState<Option | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     gsap.fromTo(
-      cardsRef.current,
+      contentRef.current,
       { opacity: 0, y: 24 },
       { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }
     );
@@ -61,94 +44,70 @@ export default function SelectAnalysisPage() {
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="flex flex-col h-screen relative overflow-hidden select-none"
-    >
-      {/* Decorative diamonds */}
-      <Diamond size={300} variant="light"  className="-top-20 -right-20" />
-      <Diamond size={140} variant="medium" className="top-1/2 -right-8" />
-      <Diamond size={60}  variant="dark"   className="bottom-28 right-36" />
-
+    <div ref={containerRef} className="relative flex flex-col h-screen select-none bg-[#FCFCFC]">
       {/* Header */}
-      <header className="flex items-center justify-between px-8 py-5 border-b border-black/[0.08] relative z-10">
-        <Link href="/" className="text-[11px] font-semibold tracking-[0.2em] uppercase">
-          Skinstric
-        </Link>
-        <span className="text-[11px] tracking-[0.15em] uppercase opacity-30">
-          Testing
-        </span>
-        <div className="w-20" />
+      <header className="relative z-10 flex items-center justify-between px-5 py-4 md:px-8 md:py-5 border-b border-black/[0.08]">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="text-sm font-bold uppercase">
+            Skinstric
+          </Link>
+          <span className="text-sm font-bold uppercase text-black/50">[ Intro ]</span>
+        </div>
+        <p className="text-[10px] md:text-xs font-normal uppercase tracking-widest text-black/30">
+          To Start Analysis
+        </p>
       </header>
 
-      {/* Content */}
-      <main className="flex flex-col flex-1 items-center justify-center px-8 relative z-10">
-        <div ref={cardsRef} className="w-full max-w-2xl text-center">
-          <p className="text-[10px] tracking-[0.25em] uppercase text-black/30 mb-3">
-            Setup your test
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight mb-10">
-            Grant camera access to get an A.I. analysis of your skin
-          </h1>
-
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
-            {/* Gallery */}
-            <button
-              onMouseEnter={() => setHovered("gallery")}
-              onMouseLeave={() => setHovered(null)}
-              onClick={() => handleSelect("gallery")}
-              className={`flex flex-col items-center justify-center gap-4 w-full sm:w-52 h-44 sm:h-52 border transition-all duration-200 ${
-                hovered === "gallery"
-                  ? "border-black bg-black text-white"
-                  : "border-black/20 bg-white text-black hover:border-black/40"
+      {/* Two diamond options, mirrored left/right like the landing page nav */}
+      <main ref={contentRef} className="relative z-10 flex flex-1 items-center justify-center px-5 md:px-16">
+        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-16 md:gap-0">
+          <button
+            onMouseEnter={() => setHovered("camera")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => handleSelect("camera")}
+            className="flex items-center gap-4 group"
+          >
+            <div
+              className={`w-24 h-24 md:w-28 md:h-28 rotate-45 border-2 flex items-center justify-center transition-all duration-300 ${
+                hovered === "camera" ? "border-black scale-110" : "border-black/30"
               }`}
             >
-              <RiImageLine size={32} />
-              <div className="text-center">
-                <p className="text-[11px] font-semibold tracking-[0.15em] uppercase">
-                  Upload Photo
-                </p>
-                <p className="text-[10px] tracking-wide opacity-50 mt-1">
-                  From gallery
-                </p>
-              </div>
-            </button>
+              <RiCameraLine size={28} className="-rotate-45" />
+            </div>
+            <span className="text-xs font-bold uppercase tracking-widest text-left max-w-[140px] opacity-70 group-hover:opacity-100 transition-opacity">
+              Allow A.I. to scan your surface
+            </span>
+          </button>
 
-            {/* Camera */}
-            <button
-              onMouseEnter={() => setHovered("camera")}
-              onMouseLeave={() => setHovered(null)}
-              onClick={() => handleSelect("camera")}
-              className={`flex flex-col items-center justify-center gap-4 w-full sm:w-52 h-44 sm:h-52 border transition-all duration-200 ${
-                hovered === "camera"
-                  ? "border-black bg-black text-white"
-                  : "border-black/20 bg-white text-black hover:border-black/40"
+          <button
+            onMouseEnter={() => setHovered("gallery")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => handleSelect("gallery")}
+            className="flex flex-row-reverse items-center gap-4 group"
+          >
+            <div
+              className={`w-24 h-24 md:w-28 md:h-28 rotate-45 border-2 flex items-center justify-center transition-all duration-300 ${
+                hovered === "gallery" ? "border-black scale-110" : "border-black/30"
               }`}
             >
-              <RiCameraLine size={32} />
-              <div className="text-center">
-                <p className="text-[11px] font-semibold tracking-[0.15em] uppercase">
-                  Take Selfie
-                </p>
-                <p className="text-[10px] tracking-wide opacity-50 mt-1">
-                  Use camera
-                </p>
-              </div>
-            </button>
-          </div>
+              <RiImageLine size={28} className="-rotate-45" />
+            </div>
+            <span className="text-xs font-bold uppercase tracking-widest text-right max-w-[140px] opacity-70 group-hover:opacity-100 transition-opacity">
+              A.I. will access gallery
+            </span>
+          </button>
         </div>
       </main>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between px-8 pb-8 relative z-10">
+      <div className="relative z-10 flex items-center px-5 py-6 md:px-8 md:pb-8">
         <Link
           href="/testing/intro"
-          className="flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase opacity-40 hover:opacity-100 transition-opacity"
+          className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity"
         >
-          <span>◀</span>
+          <DiamondIcon direction="left" active={false} />
           <span>Back</span>
         </Link>
-        <div className="w-20" />
       </div>
     </div>
   );

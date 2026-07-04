@@ -9,6 +9,18 @@ import { RiUploadLine } from "react-icons/ri";
 const PHASE_TWO_API =
   "https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo";
 
+function DiamondIcon({ direction, active }: { direction: "left" | "right"; active: boolean }) {
+  return (
+    <div
+      className={`w-6 h-6 border border-black rotate-45 flex items-center justify-center shrink-0 transition-transform duration-300 ${active ? "scale-125" : "scale-100"}`}
+    >
+      <span className="-rotate-45 text-[8px] leading-none">
+        {direction === "left" ? "◀" : "▶"}
+      </span>
+    </div>
+  );
+}
+
 export default function UploadPage() {
   const router = useRouter();
   const [preview, setPreview] = useState<string | null>(null);
@@ -55,7 +67,7 @@ export default function UploadPage() {
 
       if (!res.ok) throw new Error("API error");
 
-      const data = await res.json();
+      const { data } = await res.json();
       localStorage.setItem("skinstric-analysis", JSON.stringify(data));
 
       gsap.to(containerRef.current, {
@@ -76,14 +88,13 @@ export default function UploadPage() {
       className="flex flex-col h-screen select-none"
     >
       {/* Header */}
-      <header className="flex items-center justify-between px-8 py-5 border-b border-black/[0.08]">
-        <Link href="/" className="text-[11px] font-semibold tracking-[0.2em] uppercase">
-          Skinstric
-        </Link>
-        <span className="text-[11px] tracking-[0.15em] uppercase opacity-30">
-          Testing
-        </span>
-        <div className="w-20" />
+      <header className="flex items-center justify-between px-5 py-4 md:px-8 md:py-5 border-b border-black/[0.08]">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="text-sm font-bold uppercase">
+            Skinstric
+          </Link>
+          <span className="text-sm font-bold uppercase text-black/50">[ Analysis ]</span>
+        </div>
       </header>
 
       {/* Content */}
@@ -133,22 +144,22 @@ export default function UploadPage() {
       </main>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between px-8 pb-8">
+      <div className="flex items-center justify-between px-5 py-6 md:px-8 md:pb-8">
         <Link
           href="/testing/select-analysis"
-          className="flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase opacity-40 hover:opacity-100 transition-opacity"
+          className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity"
         >
-          <span>◀</span>
+          <DiamondIcon direction="left" active={false} />
           <span>Back</span>
         </Link>
 
         <button
           onClick={handleProceed}
           disabled={!preview || loading}
-          className="flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase disabled:opacity-20 hover:opacity-60 transition-opacity"
+          className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest disabled:opacity-20 opacity-70 hover:opacity-100 transition-opacity"
         >
           <span>{loading ? "Analyzing..." : "Proceed"}</span>
-          <span>▶</span>
+          <DiamondIcon direction="right" active={false} />
         </button>
       </div>
     </div>

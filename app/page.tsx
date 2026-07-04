@@ -1,27 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
-function CornerBracket({ position }: { position: "tl" | "tr" | "bl" | "br" }) {
-  const size = 12;
-  const paths: Record<string, string> = {
-    tl: `M${size} 0 L0 0 L0 ${size}`,
-    tr: `M0 0 L${size} 0 L${size} ${size}`,
-    bl: `M0 0 L0 ${size} L${size} ${size}`,
-    br: `M${size} 0 L${size} ${size} L0 ${size}`,
-  };
+function DiamondIcon({ direction, active }: { direction: "left" | "right"; active: boolean }) {
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none">
-      <path d={paths[position]} stroke="#1a1a1a" strokeWidth={1.5} />
-    </svg>
+    <div
+      className={`w-6 h-6 border border-black rotate-45 flex items-center justify-center shrink-0 transition-transform duration-300 ${active ? "scale-125" : "scale-100"}`}
+    >
+      <span className="-rotate-45 text-[8px] leading-none">
+        {direction === "left" ? "◀" : "▶"}
+      </span>
+    </div>
   );
 }
 
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const [hoverSide, setHoverSide] = useState<"left" | "right" | null>(null);
 
   useEffect(() => {
     const tl = gsap.timeline();
@@ -35,74 +33,94 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen select-none">
+    <div className="relative flex flex-col min-h-screen select-none bg-[#FCFCFC]">
       {/* Header */}
       <header
         ref={headerRef}
-        className="flex items-center justify-between px-5 py-4 md:px-8 md:py-5 border-b border-black/[0.08]"
+        className="relative z-10 flex items-center justify-between px-5 py-4 md:px-8 md:py-5 border-b border-black/[0.08]"
       >
-        <Link href="/" className="text-[11px] font-semibold tracking-[0.2em] uppercase">
-          Skinstric
-        </Link>
-        <div className="flex items-center gap-1.5 text-[11px] tracking-[0.15em] uppercase">
-          <CornerBracket position="tl" />
-          <CornerBracket position="bl" />
-          <span className="px-2">Intro</span>
-          <CornerBracket position="tr" />
-          <CornerBracket position="br" />
+        <div className="flex items-center gap-3">
+          <Link href="/" className="text-sm font-bold uppercase">
+            Skinstric
+          </Link>
+          <span className="text-sm font-bold uppercase text-black/50">
+            [ Intro ]
+          </span>
         </div>
         <Link
           href="/testing"
-          className="text-[11px] tracking-[0.15em] uppercase opacity-40 hover:opacity-100 transition-opacity"
+          className="bg-[#1A1B1C] text-[#FCFCFC] text-[10px] font-bold uppercase px-4 py-2 hover:bg-black/80 transition-colors"
         >
           Enter Code
         </Link>
       </header>
 
-      {/* Hero */}
+      {/* Decorative corner diamonds — isolated clipping layer so the oversized rotated shapes never interfere with page content stacking */}
+      <div className="hidden md:block absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 rotate-45 w-[602px] h-[602px] border-2 border-dashed border-[#A0A4AB]" />
+        <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 rotate-45 w-[602px] h-[602px] border-2 border-dashed border-[#A0A4AB]" />
+      </div>
+
+      {/* Hero — shifts away from whichever side button is hovered (reference site behavior) */}
       <main
         ref={heroRef}
-        className="flex flex-col flex-1 justify-end px-5 pb-16 md:px-16 md:pb-20"
+        className={`relative z-10 flex flex-col flex-1 items-center justify-center text-center px-5 py-16 transition-transform duration-300 ${
+          hoverSide === "right" ? "md:-translate-x-24 lg:-translate-x-40" : hoverSide === "left" ? "md:translate-x-24 lg:translate-x-40" : "translate-x-0"
+        }`}
       >
-        <p className="text-[10px] tracking-[0.25em] uppercase text-black/30 mb-4 md:mb-5">
-          A.I. Skincare
-        </p>
-
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-semibold leading-[1.05] tracking-[-0.02em] mb-5 md:mb-6">
+        <h1 className="text-5xl sm:text-6xl md:text-8xl font-bold leading-[1.05] tracking-[-0.02em] mb-5 md:mb-6 max-w-[680px]">
           Sophisticated<br />skincare
         </h1>
+      </main>
 
-        <p className="text-xs leading-relaxed text-black/50 max-w-[260px] mb-8 md:mb-10">
+      {/* Description — Figma spec: bottom-left corner, 14px, regular weight, uppercase, #1A1B1C */}
+      <p className="hidden md:block absolute left-8 bottom-8 z-10 text-sm leading-6 font-normal uppercase text-[#1A1B1C] max-w-[320px]">
+        Skinstric developed an A.I. that creates a highly-personalized routine
+        tailored to what your skin needs.
+      </p>
+
+      {/* Discover A.I. — left edge, vertically centered. Disappears when Take Test is hovered. */}
+      <button
+        onMouseEnter={() => setHoverSide("left")}
+        onMouseLeave={() => setHoverSide(null)}
+        className={`hidden md:flex items-center gap-4 absolute left-8 top-1/2 -translate-y-1/2 z-10 text-sm font-bold uppercase transition-opacity duration-300 ${
+          hoverSide === "right" ? "opacity-0 pointer-events-none" : "opacity-70 hover:opacity-100"
+        }`}
+      >
+        <DiamondIcon direction="left" active={hoverSide === "left"} />
+        <span>Discover A.I.</span>
+      </button>
+
+      {/* Take Test — right edge, vertically centered. Disappears when Discover A.I. is hovered. */}
+      <Link
+        href="/testing"
+        onMouseEnter={() => setHoverSide("right")}
+        onMouseLeave={() => setHoverSide(null)}
+        className={`hidden md:flex items-center gap-4 absolute right-8 top-1/2 -translate-y-1/2 z-10 text-sm font-bold uppercase transition-opacity duration-300 ${
+          hoverSide === "left" ? "opacity-0 pointer-events-none" : "opacity-70 hover:opacity-100"
+        }`}
+      >
+        <span>Take Test</span>
+        <DiamondIcon direction="right" active={hoverSide === "right"} />
+      </Link>
+
+      {/* Mobile fallback — visible only when desktop edge layout is hidden */}
+      <div className="flex md:hidden flex-col items-center gap-3 px-5 pb-6">
+        <p className="text-sm font-normal uppercase leading-6 text-[#1A1B1C] text-center max-w-[320px] mb-2">
           Skinstric developed an A.I. that creates a highly-personalized routine
           tailored to what your skin needs.
         </p>
-
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-          <Link
-            href="/testing"
-            className="flex items-center gap-2 px-6 py-3 md:px-7 bg-black text-white text-[11px] tracking-[0.15em] uppercase hover:bg-black/80 transition-colors"
-          >
-            <span>◀</span>
-            <span>Enter Experience</span>
-          </Link>
-          <Link
-            href="/testing"
-            className="flex items-center gap-2 px-6 py-3 md:px-7 border border-black text-[11px] tracking-[0.15em] uppercase hover:bg-black/[0.03] transition-colors"
-          >
-            <span>Take Test</span>
-            <span>▶</span>
-          </Link>
-        </div>
-      </main>
-
-      {/* Discover A.I. */}
-      <div className="px-5 pb-6 md:px-16 md:pb-8">
-        <button className="flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase opacity-40 hover:opacity-100 transition-opacity py-2">
-          <div className="w-4 h-4 rounded-full border border-black/50 flex items-center justify-center">
-            <span className="text-[8px]">▶</span>
-          </div>
+        <button className="flex items-center gap-2 text-sm font-bold uppercase opacity-70">
+          <DiamondIcon direction="left" active={false} />
           <span>Discover A.I.</span>
         </button>
+        <Link
+          href="/testing"
+          className="flex items-center gap-2 text-sm font-bold uppercase opacity-70"
+        >
+          <span>Take Test</span>
+          <DiamondIcon direction="right" active={false} />
+        </Link>
       </div>
     </div>
   );

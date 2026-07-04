@@ -13,65 +13,89 @@ type AnalysisData = {
 };
 
 const CATEGORY_LABELS: Record<CategoryKey, string> = {
-  race: "Race / Ethnicity",
-  age: "Age Range",
-  gender: "Gender",
+  race: "Race",
+  age: "Age",
+  gender: "Sex",
 };
 
-function sortedEntries(obj: Record<string, number>): [string, number][] {
-  return Object.entries(obj).sort((a, b) => b[1] - a[1]);
+function DiamondIcon({ direction, active }: { direction: "left" | "right"; active: boolean }) {
+  return (
+    <div
+      className={`w-6 h-6 border border-black rotate-45 flex items-center justify-center shrink-0 transition-transform duration-300 ${active ? "scale-125" : "scale-100"}`}
+    >
+      <span className="-rotate-45 text-[8px] leading-none">
+        {direction === "left" ? "◀" : "▶"}
+      </span>
+    </div>
+  );
 }
 
-function ScoreBar({
-  label,
-  value,
-  isSelected,
-  onClick,
-}: {
-  label: string;
-  value: number;
-  isSelected: boolean;
-  onClick: () => void;
-}) {
+function sortedEntries(obj: Record<string, number> | undefined): [string, number][] {
+  return obj ? Object.entries(obj).sort((a, b) => b[1] - a[1]) : [];
+}
+
+// Figma frame 013/014: a ring showing the selected entry's confidence, big % centered
+function ConfidenceRing({ percent }: { percent: number }) {
+  const radius = 90;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - percent);
+
   return (
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center justify-between py-2 px-3 transition-colors text-left ${
-        isSelected ? "bg-black text-white" : "hover:bg-black/[0.03]"
-      }`}
-    >
-      <span className="text-[11px] tracking-wide">{label}</span>
-      <span className="text-[11px] font-mono tabular-nums">
-        {(value * 100).toFixed(2)}%
-      </span>
-    </button>
+    <div className="relative w-[220px] h-[220px] shrink-0">
+      <svg viewBox="0 0 200 200" className="w-full h-full -rotate-90">
+        <circle cx="100" cy="100" r={radius} fill="none" stroke="#E5E5E5" strokeWidth="2" />
+        <circle
+          cx="100"
+          cy="100"
+          r={radius}
+          fill="none"
+          stroke="#1A1B1C"
+          strokeWidth="2"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-3xl font-semibold">
+          {Math.round(percent * 100)}
+          <span className="text-base align-top">%</span>
+        </span>
+      </div>
+    </div>
   );
+}
+
+function topEntry(obj: Record<string, number>): string {
+  return sortedEntries(obj)[0]?.[0] ?? "";
 }
 
 export default function ResultsPage() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("race");
+  const [data, setData] = useState<AnalysisData | null>(null);
   const [selections, setSelections] = useState<Record<CategoryKey, string>>({
     race: "",
     age: "",
     gender: "",
   });
-  const [data, setData] = useState<AnalysisData | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // localStorage only exists client-side; reading it here (not in a lazy
+  // useState initializer) keeps the first client render matching the SSR
+  // output, then fills in real data right after — avoids a hydration mismatch.
   useEffect(() => {
     const stored = localStorage.getItem("skinstric-analysis");
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as AnalysisData;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setData(parsed);
-        // Pre-select top result per category
-        const top = (obj: Record<string, number>) =>
-          sortedEntries(obj)[0]?.[0] ?? "";
         setSelections({
-          race: top(parsed.race),
-          age: top(parsed.age),
-          gender: top(parsed.gender),
+          race: topEntry(parsed.race),
+          age: topEntry(parsed.age),
+          gender: topEntry(parsed.gender),
         });
       } catch {
         // malformed data
@@ -89,104 +113,166 @@ export default function ResultsPage() {
     setSelections((prev) => ({ ...prev, [category]: label }));
   }
 
+  function resetCategory() {
+    if (!data) return;
+    const top = sortedEntries(data[activeCategory])[0]?.[0] ?? "";
+    selectEntry(activeCategory, top);
+  }
+
   const entries = data ? sortedEntries(data[activeCategory]) : [];
+  const selectedLabel = selections[activeCategory];
+  const selectedValue = data ? data[activeCategory]?.[selectedLabel] ?? 0 : 0;
 
   return (
-    <div ref={containerRef} className="flex flex-col h-screen select-none">
+    <div ref={containerRef} className="relative flex flex-col h-screen select-none bg-[#FCFCFC]">
       {/* Header */}
-      <header className="flex items-center justify-between px-8 py-5 border-b border-black/[0.08]">
-        <Link href="/" className="text-[11px] font-semibold tracking-[0.2em] uppercase">
-          Skinstric
-        </Link>
-        <span className="text-[11px] tracking-[0.15em] uppercase opacity-30">
-          A.I. Analysis
-        </span>
-        <div className="w-20" />
+      <header className="relative z-10 flex items-center justify-between px-5 py-4 md:px-8 md:py-5 border-b border-black/[0.08]">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="text-sm font-bold uppercase">
+            Skinstric
+          </Link>
+          <span className="text-sm font-bold uppercase text-black/50">[ Analysis ]</span>
+        </div>
       </header>
 
-      <main ref={contentRef} className="flex flex-col md:flex-row flex-1 overflow-hidden">
+      <main ref={contentRef} className="flex flex-col flex-1 overflow-hidden px-5 py-6 md:px-8">
         {!data ? (
           <div className="flex flex-1 items-center justify-center">
-            <p className="text-[11px] tracking-widest uppercase opacity-30">
+            <p className="text-xs uppercase tracking-widest text-black/40">
               No analysis data found.{" "}
               <Link href="/testing/select-analysis" className="underline">
                 Start over
               </Link>
             </p>
           </div>
-        ) : (
-          <>
-            {/* Left sidebar — confirmed selections */}
-            <aside className="w-full md:w-56 border-b md:border-b-0 md:border-r border-black/[0.08] flex flex-row md:flex-col justify-start md:justify-center gap-6 md:gap-0 px-5 py-4 md:px-6 md:py-8 shrink-0 overflow-x-auto">
-              <p className="text-[10px] tracking-[0.2em] uppercase text-black/30 mb-6">
-                Predicted
+        ) : confirmed ? (
+          <div className="flex flex-1 flex-col items-center justify-center text-center gap-8">
+            <div className="w-16 h-16 rotate-45 border-2 border-black flex items-center justify-center">
+              <span className="-rotate-45 text-xl">✓</span>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-widest text-black/30 mb-2">
+                A.I. Analysis Confirmed
               </p>
+              <h1 className="text-3xl font-bold tracking-tight">Demographics Locked In</h1>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-6 sm:gap-12">
               {(Object.keys(CATEGORY_LABELS) as CategoryKey[]).map((cat) => (
-                <div key={cat} className="mb-5">
-                  <p className="text-[10px] tracking-[0.15em] uppercase text-black/30 mb-1">
+                <div key={cat}>
+                  <p className="text-sm font-medium capitalize">{selections[cat]}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-black/40">
                     {CATEGORY_LABELS[cat]}
-                  </p>
-                  <p className="text-sm font-medium">
-                    {selections[cat] || "—"}
                   </p>
                 </div>
               ))}
-            </aside>
+            </div>
+            <Link
+              href="/testing/select-analysis"
+              className="text-xs font-bold uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity underline"
+            >
+              Start New Analysis
+            </Link>
+          </div>
+        ) : (
+          <>
+            <p className="text-[10px] uppercase tracking-widest text-black/30 mb-1">A.I. Analysis</p>
+            <h1 className="text-3xl font-bold tracking-tight mb-1">Demographics</h1>
+            <p className="text-[10px] uppercase tracking-widest text-black/30 mb-8">
+              Predicted race &amp; age
+            </p>
 
-            {/* Right — category tabs + scores */}
-            <div className="flex flex-col flex-1 overflow-hidden">
-              <div className="flex border-b border-black/[0.08] overflow-x-auto shrink-0">
+            <div className="flex flex-col md:flex-row flex-1 gap-8 overflow-hidden">
+              {/* Left — category selector */}
+              <aside className="flex md:flex-col gap-2 md:w-48 shrink-0 overflow-x-auto">
                 {(Object.keys(CATEGORY_LABELS) as CategoryKey[]).map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className={`px-6 py-4 text-[11px] tracking-[0.15em] uppercase transition-colors ${
-                      activeCategory === cat
-                        ? "border-b-2 border-black font-semibold"
-                        : "opacity-30 hover:opacity-60"
+                    className={`text-left px-4 py-3 transition-colors shrink-0 ${
+                      activeCategory === cat ? "bg-black text-white" : "bg-black/[0.03] hover:bg-black/[0.06]"
                     }`}
                   >
-                    {CATEGORY_LABELS[cat]}
+                    <p className="text-sm font-medium capitalize">{selections[cat] || "—"}</p>
+                    <p className="text-[10px] uppercase tracking-widest opacity-50">
+                      {CATEGORY_LABELS[cat]}
+                    </p>
                   </button>
                 ))}
+              </aside>
+
+              {/* Center — selected value + confidence ring */}
+              <div className="flex-1 flex items-center gap-8 min-w-0">
+                <p className="text-2xl font-medium capitalize shrink-0 hidden lg:block">
+                  {selectedLabel}
+                </p>
+                <div className="flex-1 flex items-center justify-center">
+                  <ConfidenceRing percent={selectedValue} />
+                </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto py-4 px-4">
-                <p className="text-[10px] tracking-[0.2em] uppercase text-black/30 px-3 mb-3">
-                  Probability — click to select
-                </p>
-                {entries.map(([label, value]) => (
-                  <ScoreBar
-                    key={label}
-                    label={label}
-                    value={value}
-                    isSelected={selections[activeCategory] === label}
-                    onClick={() => selectEntry(activeCategory, label)}
-                  />
-                ))}
+              {/* Right — ranked confidence list */}
+              <div className="md:w-64 shrink-0 overflow-y-auto border-t md:border-t-0 md:border-l border-black/[0.08] md:pl-6 pt-4 md:pt-0">
+                <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-black/30 mb-2 px-1">
+                  <span>{CATEGORY_LABELS[activeCategory]}</span>
+                  <span>A.I. Confidence</span>
+                </div>
+                {entries.map(([label, value]) => {
+                  const isSelected = selectedLabel === label;
+                  return (
+                    <button
+                      key={label}
+                      onClick={() => selectEntry(activeCategory, label)}
+                      className="w-full flex items-center justify-between py-2 px-1 text-left hover:bg-black/[0.03] transition-colors"
+                    >
+                      <span className="flex items-center gap-2 text-xs capitalize">
+                        <span className="text-[8px]">{isSelected ? "◆" : "◇"}</span>
+                        {label}
+                      </span>
+                      <span className="text-xs font-mono tabular-nums">
+                        {(value * 100).toFixed(0)}%
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
+
+            <p className="text-[10px] uppercase tracking-widest text-black/30 text-center mt-4">
+              If A.I. estimate is wrong, select the correct one.
+            </p>
           </>
         )}
       </main>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between px-8 pb-8 border-t border-black/[0.08] pt-4">
-        <Link
-          href="/testing/select-analysis"
-          className="flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase opacity-40 hover:opacity-100 transition-opacity"
-        >
-          <span>◀</span>
-          <span>Back</span>
-        </Link>
-        <Link
-          href="/testing/camera"
-          className="flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase opacity-40 hover:opacity-100 transition-opacity"
-        >
-          <span>Proceed</span>
-          <span>▶</span>
-        </Link>
-      </div>
+      {!confirmed && (
+        <div className="relative z-10 flex items-center justify-between px-5 py-6 md:px-8 md:pb-8 border-t border-black/[0.08]">
+          <Link
+            href="/testing/select-analysis"
+            className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity"
+          >
+            <DiamondIcon direction="left" active={false} />
+            <span>Back</span>
+          </Link>
+
+          {data && (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={resetCategory}
+                className="px-5 py-2 border border-black/20 text-xs font-bold uppercase tracking-widest hover:bg-black/5 transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={() => setConfirmed(true)}
+                className="px-5 py-2 bg-[#1A1B1C] text-[#FCFCFC] text-xs font-bold uppercase tracking-widest hover:bg-black/80 transition-colors"
+              >
+                Confirm
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
