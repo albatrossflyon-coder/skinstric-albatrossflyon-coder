@@ -4,21 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { DiamondIcon } from "@/components/DiamondIcon";
+import { STORAGE_KEYS } from "@/lib/storageKeys";
 
 const PHASE_ONE_API =
   "https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseOne";
-
-function DiamondIcon({ direction, active }: { direction: "left" | "right"; active: boolean }) {
-  return (
-    <div
-      className={`w-6 h-6 border border-black rotate-45 flex items-center justify-center shrink-0 transition-transform duration-300 ${active ? "scale-125" : "scale-100"}`}
-    >
-      <span className="-rotate-45 text-[8px] leading-none">
-        {direction === "left" ? "◀" : "▶"}
-      </span>
-    </div>
-  );
-}
 
 // Figma "rombuses" group: nested diamonds sharing one 2px dashed #A0A4AB border
 function ConcentricDiamonds() {
@@ -102,7 +92,7 @@ export default function IntroPage() {
 
       const data = await res.json();
       localStorage.setItem(
-        "skinstric-user",
+        STORAGE_KEYS.USER,
         JSON.stringify({ name: name.trim(), location: location.trim(), ...data })
       );
 

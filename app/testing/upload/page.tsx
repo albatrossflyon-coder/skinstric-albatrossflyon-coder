@@ -5,21 +5,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { RiUploadLine } from "react-icons/ri";
+import { DiamondIcon } from "@/components/DiamondIcon";
+import { STORAGE_KEYS } from "@/lib/storageKeys";
 
 const PHASE_TWO_API =
   "https://us-central1-frontend-simplified.cloudfunctions.net/skinstricPhaseTwo";
-
-function DiamondIcon({ direction, active }: { direction: "left" | "right"; active: boolean }) {
-  return (
-    <div
-      className={`w-6 h-6 border border-black rotate-45 flex items-center justify-center shrink-0 transition-transform duration-300 ${active ? "scale-125" : "scale-100"}`}
-    >
-      <span className="-rotate-45 text-[8px] leading-none">
-        {direction === "left" ? "◀" : "▶"}
-      </span>
-    </div>
-  );
-}
 
 export default function UploadPage() {
   const router = useRouter();
@@ -68,7 +58,7 @@ export default function UploadPage() {
       if (!res.ok) throw new Error("API error");
 
       const { data } = await res.json();
-      localStorage.setItem("skinstric-analysis", JSON.stringify(data));
+      localStorage.setItem(STORAGE_KEYS.ANALYSIS, JSON.stringify(data));
 
       gsap.to(containerRef.current, {
         opacity: 0,

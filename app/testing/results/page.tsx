@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { DiamondIcon } from "@/components/DiamondIcon";
+import { STORAGE_KEYS } from "@/lib/storageKeys";
 
 type CategoryKey = "race" | "age" | "gender";
 
@@ -17,18 +19,6 @@ const CATEGORY_LABELS: Record<CategoryKey, string> = {
   age: "Age",
   gender: "Sex",
 };
-
-function DiamondIcon({ direction, active }: { direction: "left" | "right"; active: boolean }) {
-  return (
-    <div
-      className={`w-6 h-6 border border-black rotate-45 flex items-center justify-center shrink-0 transition-transform duration-300 ${active ? "scale-125" : "scale-100"}`}
-    >
-      <span className="-rotate-45 text-[8px] leading-none">
-        {direction === "left" ? "◀" : "▶"}
-      </span>
-    </div>
-  );
-}
 
 function sortedEntries(obj: Record<string, number> | undefined): [string, number][] {
   return obj ? Object.entries(obj).sort((a, b) => b[1] - a[1]) : [];
@@ -86,7 +76,7 @@ export default function ResultsPage() {
   // useState initializer) keeps the first client render matching the SSR
   // output, then fills in real data right after — avoids a hydration mismatch.
   useEffect(() => {
-    const stored = localStorage.getItem("skinstric-analysis");
+    const stored = localStorage.getItem(STORAGE_KEYS.ANALYSIS);
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as AnalysisData;
