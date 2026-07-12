@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
-const VALID_CODE = "CfbKtsghNgHVlFyt1lY2RdDfQsowB2zo7XA5zWoxoeKHoiUj#8XawtihnzH7w_jfdvGgk0IwW7EkpKrQc7p62X5VSnM0";
-
 function Diamond({
   size,
   variant,
@@ -43,7 +41,7 @@ function Diamond({
 
 export default function TestingPage() {
   const router = useRouter();
-  const [code, setCode] = useState("");
+  const [city, setCity] = useState("");
   const [error, setError] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
@@ -58,15 +56,15 @@ export default function TestingPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (code.trim() === VALID_CODE) {
-      gsap.to(containerRef.current, {
-        opacity: 0,
-        duration: 0.3,
-        onComplete: () => router.push("/testing/intro"),
-      });
-    } else {
-      setError("Invalid code. Please try again.");
+    if (!city.trim()) {
+      setError("Please enter your city.");
+      return;
     }
+    gsap.to(containerRef.current, {
+      opacity: 0,
+      duration: 0.3,
+      onComplete: () => router.push("/testing/intro"),
+    });
   }
 
   return (
@@ -100,16 +98,16 @@ export default function TestingPage() {
             To Start Analysis
           </p>
           <h1 className="text-2xl font-semibold tracking-tight mb-10">
-            Enter Code to Start Analysis
+            Enter City to Start Analysis
           </h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
             <div className="w-full border-b border-black/20 pb-2">
               <input
                 type="text"
-                value={code}
+                value={city}
                 onChange={(e) => {
-                  setCode(e.target.value);
+                  setCity(e.target.value);
                   setError("");
                 }}
                 placeholder="Click to Type"

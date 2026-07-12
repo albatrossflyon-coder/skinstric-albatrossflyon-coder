@@ -45,6 +45,8 @@ Next.js 15 + TypeScript + Tailwind + react-icons + GSAP. Assignment: Figma file 
 Type-check and lint clean after all fixes.
 - Figma frame 001 confirmed = landing page's "Take Test" hover state (already built, not a separate page). No frame exists for the "Enter Code to Start Analysis" screen at `/testing` — the reference site's own "ENTER CODE" button is a dead/unwired control, so this screen has no visual spec to check against; built from the assignment's functional requirement instead.
 
+**2026-07-12 — Deployed to Vercel production.** Live at https://skinstric-albatrossflyon-coder.vercel.app (project `albatrossflyon1-3105s-projects/skinstric-albatrossflyon-coder`). Local `npm run build` verified clean first (all 7 routes prerendered), then `vercel --prod --yes`. Confirmed live via HTTP 200 + correct page title. No env vars needed (Phase 1/2 APIs are called directly, no secrets). GitHub auto-deploy-on-push connection failed during link ("Failed to connect...to project") — likely Vercel's GitHub App is authorized against the wrong of Chris's two GitHub accounts (same account-mixup pattern already found/fixed for git commit identity on other repos this cycle). Not blocking — site is live — but future changes need a manual `vercel --prod` redeploy until Chris re-links the GitHub App to the correct account himself (browser-side action).
+
 ## Known non-issues (don't re-diagnose)
 - GSAP fade-ins look "stuck invisible" in automated screenshots when the browser tab loses focus (Chrome throttles rAF on hidden tabs) — not a real bug, just a browser-automation artifact.
 - Grammarly-caused hydration warnings are false positives from a browser extension touching the DOM pre-hydration, not a code bug.
