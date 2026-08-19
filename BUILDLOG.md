@@ -2,6 +2,11 @@
 
 Source of truth for what exists in this repo. Update on every feature/file ship: date, what was built, files changed, status.
 
+## Tech Stack
+
+- **Languages**: TypeScript
+- **Frameworks/Libraries**: Next.js, Tailwind CSS, GSAP, react-icons
+
 ## Context
 Next.js 15 + TypeScript + Tailwind + react-icons + GSAP. Assignment: Figma file "Skinstric" — page "Skinstric Internship" (frames 000-014, in scope) vs "Skinstric Full Project" (out of scope). Reference/example site: `skinstric-wandag.vercel.app` (used for exact computed-style extraction since Figma Dev Mode is paywalled on this account). GitHub collaborator: MichelMitri1. Deadline: 2026-06-03 (per 2026-05-20 session note — reconfirm with Chris/Michel if still accurate).
 
