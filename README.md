@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Skinstric — AI Skin Analysis Flow
 
-## Getting Started
+A 7-screen AI skin-analysis product flow, rebuilt frame-for-frame from a Figma spec as part of the [Frontend Simplified](https://frontendsimplified.com) internship program.
 
-First, run the development server:
+**Live**: [skinstric-albatrossflyon-coder.vercel.app](https://skinstric-albatrossflyon-coder.vercel.app)
+
+---
+
+## What it is
+
+A pixel-accurate rebuild of Skinstric's AI-powered skin analysis product, wired to live backend APIs — not a static mockup. The flow takes a user from landing, through name/location entry, photo capture (upload or live camera), and into an animated demographics results view.
+
+## Screens
+
+- **Landing** — entry point matching the Figma spec
+- **Code entry** — access flow
+- **Intro** — sequential diamond click-to-type interaction pattern
+- **Select analysis** — diamond-button selection UI
+- **Upload** — photo upload with diamond nav
+- **Camera** — live camera capture flow
+- **Results** — 3-panel demographics view with animated confidence rings
+
+## Tech Stack
+
+- **Next.js 16** — app framework
+- **TypeScript** — type safety
+- **Tailwind CSS** — styling
+- **GSAP** — confidence-ring and transition animations
+- **react-icons** — iconography
+
+Wired to live backend APIs for face/demographic analysis, with real request/response handling (not mocked data).
+
+## Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+See `BUILDLOG.md` for session-by-session build history.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Author
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Chris Brown
+[Portfolio](https://chrisbrown-dev.vercel.app)
